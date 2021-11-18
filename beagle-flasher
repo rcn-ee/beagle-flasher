@@ -5,12 +5,19 @@ if ! id | grep -q root; then
 	exit
 fi
 
-version="20211118.0: ReWrite from Scratch..."
+version_message="20211118.0: ReWrite from Scratch..."
 
 broadcast () {
 	if [ "x${message}" != "x" ] ; then
 		echo "${message}"
-		#echo "${message}" > /dev/tty0 || true
+		echo "${message}" > /dev/tty0 || true
+	fi
+}
+
+broadcast_file () {
+	if [ -f ${bfile} ] ; then
+		cat ${bfile}
+		cat ${bfile} > /dev/tty0 || true
 	fi
 }
 
@@ -25,6 +32,9 @@ message="-----------------------------" ; broadcast
 
 ###FIXME
 if [ -f /etc/default/beagle-flasher ] ; then
+	message="-----------------------------" ; broadcast
+	bfile="/etc/default/beagle-flasher"     ; broadcast_file
+	message="-----------------------------" ; broadcast
 	. /etc/default/beagle-flasher
 else
 	message="ERROR: Please setup: /etc/default/beagle-flasher" ; broadcast
