@@ -163,6 +163,10 @@ copy_rootfs () {
 	message="`cat /tmp/rootfs/etc/fstab`"                                                      ; broadcast
 	message="--------------------------------------------------------------------------------" ; broadcast
 
+	message="INFO: [cat /tmp/rootfs/boot/uEnv.txt]"                                            ; broadcast
+	message="`cat /tmp/rootfs/boot/uEnv.txt`"                                                  ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
+
 	if [ "x${flash_back}" != "x" ] ; then
 		if [ -f /etc/beagle-flasher/${flash_back} ] ; then
 			message="INFO: [cp -v /etc/beagle-flasher/${flash_back} /tmp/rootfs/etc/default/beagle-flasher]" ; broadcast
@@ -173,8 +177,27 @@ copy_rootfs () {
 
 	message="Copying: ${source}p${media_rootfs} -> ${destination}p${media_rootfs} complete"    ; broadcast
 	message="--------------------------------------------------------------------------------" ; broadcast
+	flush_cache
 
-	message="Final System Tweaks:" ; broadcast
+	message="INFO: [umount /tmp || true]"                                                      ; broadcast
+	umount /tmp || true
+	message="--------------------------------------------------------------------------------" ; broadcast
+	flush_cache
+
+	message="INFO: Force writeback of eMMC buffers by Syncing: ${destination}"                 ; broadcast
+	message="INFO: [dd if=${destination} of=/dev/null count=100000 status=progress]"           ; broadcast
+	dd if=${destination} of=/dev/null count=100000 status=progress
+	message="--------------------------------------------------------------------------------" ; broadcast
+	flush_cache
+
+	unset are_we_flasher
+	are_we_flasher=$(grep init-beagle-flasher /proc/cmdline || true)
+	if [ ! "x${are_we_flasher}" = "x" ] ; then
+		message="INFO: [We are init]"                                                      ; broadcast
+		#When run as init
+		exec /sbin/init
+		exit #We should not hit that
+	fi
 }
 
 partition_drive () {
