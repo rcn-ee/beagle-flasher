@@ -10,9 +10,9 @@ version_message="20211118.0: ReWrite from Scratch..."
 flush_cache () {
 	sync
 	if [ "x${destination}" != "x" ] ; then
-		message="INFO: [blockdev --flushbufs ${destination}]"                            ; broadcast
+		message="INFO: [blockdev --flushbufs ${destination}]"                             ; broadcast
 		blockdev --flushbufs ${destination} || true
-		message="----------------------------------------------------------------------" ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 	fi
 }
 
@@ -26,18 +26,18 @@ broadcast () {
 }
 
 example_failure () {
-	message="Example: /etc/default/beagle-flasher"                                   ; broadcast
-	message="----------------------------------------------------------------------" ; broadcast
-	message="debug_over_display=tty0"                                                ; broadcast
-	message="source=/dev/mmcblk0"                                                    ; broadcast
-	message="destination=/dev/mmcblk1"                                               ; broadcast
-	message="----------------------------------------------------------------------" ; broadcast
+	message="Example: /etc/default/beagle-flasher"                                    ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
+	message="debug_over_display=tty0"                                                 ; broadcast
+	message="source=/dev/mmcblk0"                                                     ; broadcast
+	message="destination=/dev/mmcblk1"                                                ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
 	exit 2
 }
 
 write_failure () {
-	message="ERROR: writing to [destination=${destination}] failed..."               ; broadcast
-	message="----------------------------------------------------------------------" ; broadcast
+	message="ERROR: writing to [destination=${destination}] failed..."                ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
 	flush_cache
 	if [ "x${destination}" != "x" ] ; then
 		umount ${destination}p1 > /dev/null 2>&1 || true
@@ -47,55 +47,55 @@ write_failure () {
 
 check_running_system () {
 	if [ "x${source}" != "x" ] && [ "x${destination}" != "x" ] ; then
-		message="INFO: [lsblk]"                                                          ; broadcast
-		message="`lsblk || true`"                                                        ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
-		message="INFO: copying [${source}] -> [${destination}]"                          ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="INFO: [lsblk]"                                                           ; broadcast
+		message="`lsblk || true`"                                                         ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
+		message="INFO: copying [${source}] -> [${destination}]"                           ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 	else
-		message="INFO: [lsblk]"                                                          ; broadcast
-		message="`lsblk || true`"                                                        ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
-		message="ERROR: Setup: [source] or [destination] in /etc/default/beagle-flasher" ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="INFO: [lsblk]"                                                           ; broadcast
+		message="`lsblk || true`"                                                         ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
+		message="ERROR: Setup: [source] and [destination] in /etc/default/beagle-flasher" ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 		example_failure
 	fi
 
 	if [ ! -b "${source}" ] ; then
-		message="ERROR: [source=${source}] does not exist"                               ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="ERROR: [source=${source}] does not exist"                                ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 		example_failure
 	else
-		message="INFO: [source=${source}] is a valid block device"                       ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="INFO: [source=${source}] is a valid block device"                        ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 	fi
 
 	if [ ! -b "${destination}" ] ; then
-		message="ERROR: [destination=${destination}] does not exist"                     ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="ERROR: [destination=${destination}] does not exist"                      ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 		example_failure
 	else
-		message="INFO: [destination=${destination}] is a valid block device"             ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="INFO: [destination=${destination}] is a valid block device"              ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 	fi
 
 	if [ ! -f /boot/config-$(uname -r) ] ; then
 		zcat /proc/config.gz > /boot/config-$(uname -r) || true
-		message="INFO: Creating: [/boot/config-$(uname -r)]"                             ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="INFO: Creating: [/boot/config-$(uname -r)]"                              ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 	else
-		message="INFO: [/boot/config-$(uname -r)]"                                       ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="INFO: [/boot/config-$(uname -r)]"                                        ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 	fi
 
 	if [ -f /boot/initrd.img-$(uname -r) ] ; then
 		update-initramfs -u -k $(uname -r) || true
-		message="INFO: Updating: [/boot/initrd.img-$(uname -r)]"                         ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="INFO: Updating: [/boot/initrd.img-$(uname -r)]"                          ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 	else
 		update-initramfs -c -k $(uname -r) || true
-		message="INFO: Creating: [/boot/initrd.img-$(uname -r)]"                         ; broadcast
-		message="----------------------------------------------------------------------" ; broadcast
+		message="INFO: Creating: [/boot/initrd.img-$(uname -r)]"                          ; broadcast
+		message="-----------------------------------------------------------------------" ; broadcast
 	fi
 	flush_cache
 }
@@ -104,17 +104,17 @@ check_running_system () {
 if [ -f /etc/default/beagle-flasher ] ; then
 	clear
 	. /etc/default/beagle-flasher
-	message="----------------------------------------------------------------------" ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
 	message="Version: [${version_message}]" ; broadcast
-	message="----------------------------------------------------------------------" ; broadcast
-	message="cat /etc/default/beagle-flasher:"                                       ; broadcast
-	message="----------------------------------------------------------------------" ; broadcast
-	message="`cat /etc/default/beagle-flasher`"                                      ; broadcast
-	message="----------------------------------------------------------------------" ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
+	message="cat /etc/default/beagle-flasher:"                                        ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
+	message="`cat /etc/default/beagle-flasher`"                                       ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
 else
-	message="----------------------------------------------------------------------" ; broadcast
-	message="Version: [${version_message}]"                                          ; broadcast
-	message="----------------------------------------------------------------------" ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
+	message="Version: [${version_message}]"                                           ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
 	example_failure
 fi
 
