@@ -25,6 +25,14 @@ broadcast () {
 	fi
 }
 
+broadcast_over_display () {
+	if [ "x${message}" != "x" ] ; then
+		if [ "x${debug_over_display}" != "x" ] ; then
+			echo "${message}" > /dev/${debug_over_display} || true
+		fi
+	fi
+}
+
 example_failure () {
 	message="Example: /etc/default/beagle-flasher"                                    ; broadcast
 	message="-----------------------------------------------------------------------" ; broadcast
@@ -89,7 +97,7 @@ check_running_system () {
 	fi
 
 	message="INFO: Generating: [/boot/initrd.img-$(uname -r)]"                        ; broadcast
-	message="update-initramfs: Generating /boot/initrd.img-$(uname -r)"               ; broadcast
+	message="update-initramfs: Generating /boot/initrd.img-$(uname -r)"               ; broadcast_over_display
 	if [ -f /boot/initrd.img-$(uname -r) ] ; then
 		update-initramfs -u -k $(uname -r) || true
 		message="-----------------------------------------------------------------------" ; broadcast
@@ -98,6 +106,20 @@ check_running_system () {
 		message="-----------------------------------------------------------------------" ; broadcast
 	fi
 	flush_cache
+}
+
+partition_drive () {
+	message="INFO: Erasing: [${destination}]"                                         ; broadcast
+	flush_cache
+	message="INFO: [dd if=/dev/zero of=${destination} bs=1M count=108]"               ; broadcast
+	dd if=/dev/zero of=${destination} bs=1M count=108
+	sync
+	message="INFO: [dd if=${destination} of=/dev/null bs=1M count=108]"               ; broadcast
+	dd if=${destination} of=/dev/null bs=1M count=108
+	sync
+	flush_cache
+	message="INFO: Erasing: [${destination}] complete"                                ; broadcast
+	message="-----------------------------------------------------------------------" ; broadcast
 }
 
 ###FIXME
@@ -119,3 +141,4 @@ else
 fi
 
 check_running_system
+partition_drive
