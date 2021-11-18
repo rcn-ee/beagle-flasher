@@ -66,6 +66,25 @@ write_failure () {
 }
 
 check_running_system () {
+	message="INFO: Giving system time to stablize..."                                          ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
+	message="5"                                                                                ; broadcast
+	sleep 1
+	message="4"                                                                                ; broadcast
+	sleep 1
+	message="3"                                                                                ; broadcast
+	sleep 1
+	message="2"                                                                                ; broadcast
+	sleep 1
+	message="1"                                                                                ; broadcast
+	sleep 1
+	message="--------------------------------------------------------------------------------" ; broadcast
+
+	message="INFO: Preparing /tmp"                                                             ; broadcast
+	message="INFO: [mount -t tmpfs tmpfs /tmp]"                                                ; broadcast
+	mount -t tmpfs tmpfs /tmp
+	message="--------------------------------------------------------------------------------" ; broadcast
+
 	if [ -f /proc/sys/vm/min_free_kbytes ] ; then
 		message="INFO: Preparing sysctl"                                                           ; broadcast
 		value_min_free_kbytes=$(sysctl -n vm.min_free_kbytes)
