@@ -13,7 +13,6 @@ flush_cache () {
 	if [ "x${destination}" != "x" ] ; then
 		message="INFO: [blockdev --flushbufs ${destination}]"                                                ; broadcast
 		blockdev --flushbufs ${destination} || true
-		message="------------------------------------------------------------------------------------------" ; broadcast
 	fi
 }
 
@@ -40,6 +39,9 @@ example_failure () {
 	message="debug_over_display=tty0"                                                                    ; broadcast
 	message="source=/dev/mmcblk0"                                                                        ; broadcast
 	message="destination=/dev/mmcblk1"                                                                   ; broadcast
+	message="rfs_partition=single"                                                                       ; broadcast
+	message="rfs_rootfs_type=ext4"                                                                       ; broadcast
+	message="rfs_rootfs_startmb=4"                                                                       ; broadcast
 	message="------------------------------------------------------------------------------------------" ; broadcast
 	exit 2
 }
@@ -119,6 +121,38 @@ partition_drive () {
 	flush_cache
 	message="INFO: Erasing: [${destination}] complete"                                                   ; broadcast
 	message="------------------------------------------------------------------------------------------" ; broadcast
+
+
+	if [ "x${rfs_partition}" = "xsingle" ] ; then
+		rfs_rootfs_startmb=${rfs_rootfs_startmb:-"4"}
+
+		if [ "x${rfs_rootfs_type}" = "xext4" ] ; then
+			sfdisk_fstype="L"
+		fi
+
+		sfdisk_options="--force --Linux --in-order --unit M"
+		sfdisk_boot_startmb="${rfs_rootfs_startmb}M"
+
+		message="INFO: Formatting: ${destination}"                                                           ; broadcast
+		message="INFO: sfdisk: [$(LC_ALL=C sfdisk --version)]"                                               ; broadcast
+		message="INFO: sfdisk: [sfdisk ${sfdisk_options} ${destination}]"                                    ; broadcast
+		message="INFO: sfdisk: [${sfdisk_boot_startmb},,${sfdisk_fstype},*]"                                 ; broadcast
+		message="------------------------------------------------------------------------------------------" ; broadcast
+
+		LC_ALL=C sfdisk ${sfdisk_options} "${destination}" <<-__EOF__
+			${sfdisk_boot_startmb},,${sfdisk_fstype},*
+		__EOF__
+
+		flush_cache
+		#format_single_root
+		message="INFO: Formatting: ${destination} complete"                                                  ; broadcast
+		message="------------------------------------------------------------------------------------------" ; broadcast
+
+		media_rootfs="1"
+		#copy_rootfs
+	else
+		example_failure
+	fi
 }
 
 ###FIXME
