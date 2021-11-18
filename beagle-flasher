@@ -32,17 +32,17 @@ example_failure () {
 	message="source=/dev/mmcblk0"                                                    ; broadcast
 	message="destination=/dev/mmcblk1"                                               ; broadcast
 	message="----------------------------------------------------------------------" ; broadcast
+	exit 2
 }
 
 write_failure () {
-	message="INFO: writing to [${destination}] failed..."                            ; broadcast
+	message="ERROR: writing to [destination=${destination}] failed..."               ; broadcast
 	message="----------------------------------------------------------------------" ; broadcast
 	flush_cache
 	if [ "x${destination}" != "x" ] ; then
 		umount ${destination}p1 > /dev/null 2>&1 || true
 		umount ${destination}p2 > /dev/null 2>&1 || true
 	fi
-	exit 2
 }
 
 check_running_system () {
@@ -60,9 +60,9 @@ check_running_system () {
 	fi
 
 	if [ ! -b "${destination}" ] ; then
-		message="Error: [destination=${destination}] does not exist"                     ; broadcast
+		message="ERROR: [destination=${destination}] does not exist"                     ; broadcast
 		message="----------------------------------------------------------------------" ; broadcast
-		write_failure
+		example_failure
 	else
 		message="INFO: [destination${destination}] is a valid block device"              ; broadcast
 		message="----------------------------------------------------------------------" ; broadcast
