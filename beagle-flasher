@@ -191,6 +191,14 @@ partition_drive () {
 	message="INFO: Erasing: [${destination}] complete"                                         ; broadcast
 	message="--------------------------------------------------------------------------------" ; broadcast
 
+	if [ "x${bootloader}" != "x" ]
+		if [ -f ${bootloader} ] ; then
+			message="INFO: [/bin/bash ${bootloader}]"                                                  ; broadcast
+			/bin/bash ${bootloader}
+			message="--------------------------------------------------------------------------------" ; broadcast
+		fi
+	fi
+
 	if [ "x${rfs_partition}" = "xsingle" ] ; then
 		rfs_rootfs_startmb=${rfs_rootfs_startmb:-"4"}
 
