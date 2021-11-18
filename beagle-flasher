@@ -97,24 +97,6 @@ check_running_system () {
 		message="INFO: [destination=${destination}] is a valid block device"                       ; broadcast
 	fi
 
-	if [ ! -f /sbin/sfdisk ] ; then
-		message="ERROR: Missing [/sbin/sfdisk]"                                                    ; broadcast
-		message="--------------------------------------------------------------------------------" ; broadcast
-		example_failure
-	fi
-
-	if [ ! -f /sbin/mkfs.ext4 ] ; then
-		message="ERROR: Missing [/sbin/mkfs.ext4]"                                                 ; broadcast
-		message="--------------------------------------------------------------------------------" ; broadcast
-		example_failure
-	fi
-
-	if [ ! -f /usr/bin/rsync ] ; then
-		message="ERROR: Missing [/usr/bin/rsync]"                                                  ; broadcast
-		message="--------------------------------------------------------------------------------" ; broadcast
-		example_failure
-	fi
-
 	if [ ! -f /boot/config-$(uname -r) ] ; then
 		zcat /proc/config.gz > /boot/config-$(uname -r) || true
 		message="INFO: Creating: [/boot/config-$(uname -r)]"                                       ; broadcast
@@ -122,14 +104,16 @@ check_running_system () {
 		message="INFO: [/boot/config-$(uname -r)]"                                                 ; broadcast
 	fi
 
-	message="INFO: Generating: [/boot/initrd.img-$(uname -r)]"                                         ; broadcast
-	message="update-initramfs: Generating /boot/initrd.img-$(uname -r)"                                ; broadcast_over_display
-	if [ -f /boot/initrd.img-$(uname -r) ] ; then
-		update-initramfs -u -k $(uname -r) || true
-		message="--------------------------------------------------------------------------------" ; broadcast
-	else
-		update-initramfs -c -k $(uname -r) || true
-		message="--------------------------------------------------------------------------------" ; broadcast
+	if [ -f /usr/sbin/update-initramfs ] ; then
+		message="INFO: Generating: [/boot/initrd.img-$(uname -r)]"                                         ; broadcast
+		message="update-initramfs: Generating /boot/initrd.img-$(uname -r)"                                ; broadcast_over_display
+		if [ -f /boot/initrd.img-$(uname -r) ] ; then
+			/usr/sbin/update-initramfs -u -k $(uname -r) || true
+			message="--------------------------------------------------------------------------------" ; broadcast
+		else
+			/usr/sbin/update-initramfs -c -k $(uname -r) || true
+			message="--------------------------------------------------------------------------------" ; broadcast
+		fi
 	fi
 	flush_cache
 }
