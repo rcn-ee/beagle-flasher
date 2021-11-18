@@ -88,13 +88,13 @@ check_running_system () {
 		message="-----------------------------------------------------------------------" ; broadcast
 	fi
 
+	message="INFO: Generating: [/boot/initrd.img-$(uname -r)]"                        ; broadcast
+	message="update-initramfs: Generating /boot/initrd.img-$(uname -r)"               ; broadcast
 	if [ -f /boot/initrd.img-$(uname -r) ] ; then
 		update-initramfs -u -k $(uname -r) || true
-		message="INFO: Updating: [/boot/initrd.img-$(uname -r)]"                          ; broadcast
 		message="-----------------------------------------------------------------------" ; broadcast
 	else
 		update-initramfs -c -k $(uname -r) || true
-		message="INFO: Creating: [/boot/initrd.img-$(uname -r)]"                          ; broadcast
 		message="-----------------------------------------------------------------------" ; broadcast
 	fi
 	flush_cache
