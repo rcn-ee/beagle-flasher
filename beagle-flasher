@@ -1,0 +1,32 @@
+#!/bin/bash -e
+
+if ! id | grep -q root; then
+	echo "must be run as root"
+	exit
+fi
+
+version="20211118.0: ReWrite from Scratch..."
+
+broadcast () {
+	if [ "x${message}" != "x" ] ; then
+		echo "${message}"
+		#echo "${message}" > /dev/tty0 || true
+	fi
+}
+
+failure () {
+	message="-----------------------------" ; broadcast
+}
+
+clear
+message="-----------------------------" ; broadcast
+message="Version: [${version_message}]" ; broadcast
+message="-----------------------------" ; broadcast
+
+###FIXME
+if [ -f /etc/default/beagle-flasher ] ; then
+	. /etc/default/beagle-flasher
+else
+	message="ERROR: Please setup: /etc/default/beagle-flasher" ; broadcast
+	failure
+fi
