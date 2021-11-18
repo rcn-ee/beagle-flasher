@@ -19,8 +19,9 @@ mkfs_options=""
 flush_cache () {
 	sync
 	if [ "x${destination}" != "x" ] ; then
-		message="INFO: [blockdev --flushbufs ${destination}]"                                                ; broadcast
+		message="INFO: flush_cache: [blockdev --flushbufs ${destination}]"                                   ; broadcast
 		blockdev --flushbufs ${destination} || true
+		message="------------------------------------------------------------------------------------------" ; broadcast
 	fi
 }
 
@@ -161,7 +162,7 @@ partition_drive () {
 		sfdisk_options="--force"
 		sfdisk_boot_startmb="${rfs_rootfs_startmb}M"
 
-		message="INFO: Formatting: ${destination}"                                                           ; broadcast
+		message="INFO: Partitioning: ${destination}"                                                         ; broadcast
 		message="INFO: /sbin/sfdisk: [$(LC_ALL=C /sbin/sfdisk --version)]"                                   ; broadcast
 		message="INFO: /sbin/sfdisk: [/sbin/sfdisk ${sfdisk_options} ${destination}]"                        ; broadcast
 		message="INFO: /sbin/sfdisk: [${sfdisk_boot_startmb},,${sfdisk_fstype},*]"                           ; broadcast
@@ -172,6 +173,7 @@ partition_drive () {
 		__EOF__
 
 		flush_cache
+		message="INFO: Formatting: ${destination}"                                                           ; broadcast
 		format_single_root
 		message="INFO: Formatting: ${destination} complete"                                                  ; broadcast
 		message="------------------------------------------------------------------------------------------" ; broadcast
