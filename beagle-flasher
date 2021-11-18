@@ -16,8 +16,11 @@ broadcast () {
 
 broadcast_file () {
 	if [ -f ${bfile} ] ; then
+		message="cat ${bfile}" ; broadcast
+		message="-----------------------------" ; broadcast
 		cat ${bfile}
 		cat ${bfile} > /dev/tty0 || true
+		message="-----------------------------" ; broadcast
 	fi
 }
 
