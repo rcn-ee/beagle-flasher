@@ -47,14 +47,14 @@ write_failure () {
 
 check_running_system () {
 	if [ "x${source}" != "x" ] && [ "x${destination}" != "x" ] ; then
-		message="INFO: [lsblk]"                                                           ; broadcast
-		message="`lsblk || true`"                                                         ; broadcast
+		message="INFO: [lsblk -i]"                                                        ; broadcast
+		message="`lsblk -i || true`"                                                      ; broadcast
 		message="-----------------------------------------------------------------------" ; broadcast
 		message="INFO: copying [${source}] -> [${destination}]"                           ; broadcast
 		message="-----------------------------------------------------------------------" ; broadcast
 	else
-		message="INFO: [lsblk]"                                                           ; broadcast
-		message="`lsblk || true`"                                                         ; broadcast
+		message="INFO: [lsblk -i]"                                                        ; broadcast
+		message="`lsblk -i || true`"                                                      ; broadcast
 		message="-----------------------------------------------------------------------" ; broadcast
 		message="ERROR: Setup: [source] and [destination] in /etc/default/beagle-flasher" ; broadcast
 		message="-----------------------------------------------------------------------" ; broadcast
