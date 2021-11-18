@@ -8,9 +8,9 @@ fi
 version_message="20211118.0: ReWrite from Scratch..."
 
 flush_cache () {
-	message="----------------------------------------------------------------------" ; broadcast
 	sync
 	if [ "x${destination}" != "x" ] ; then
+		message="INFO: [blockdev --flushbufs ${destination}]"                    ; broadcast
 		blockdev --flushbufs ${destination} || true
 	fi
 	message="----------------------------------------------------------------------" ; broadcast
@@ -35,8 +35,7 @@ example_failure () {
 }
 
 write_failure () {
-	message="writing to [${destination}] failed..."                                  ; broadcast
-
+	message="INFO: writing to [${destination}] failed..."                            ; broadcast
 	message="----------------------------------------------------------------------" ; broadcast
 	flush_cache
 	if [ "x${destination}" != "x" ] ; then
@@ -47,7 +46,7 @@ write_failure () {
 
 check_running_system () {
 	if [ "x${source}" != "x" ] && [ "x${destination}" != "x" ] ; then
-		message="copying: [${source}] -> [${destination}]"                               ; broadcast
+		message="INFO: copying [${source}] -> [${destination}]"                          ; broadcast
 		message="INFO: [lsblk]"                                                          ; broadcast
 		message="`lsblk || true`"                                                        ; broadcast
 		message="----------------------------------------------------------------------" ; broadcast
@@ -60,11 +59,11 @@ check_running_system () {
 	fi
 
 	if [ ! -b "${destination}" ] ; then
-		message="Error: [${destination}] does not exist"                                 ; broadcast
+		message="Error: [destination=${destination}] does not exist"                     ; broadcast
 		message="----------------------------------------------------------------------" ; broadcast
 		write_failure
 	else
-		message="INFO: [${destination}] is a valid block device"                         ; broadcast
+		message="INFO: [destination${destination}] is a valid block device"              ; broadcast
 		message="----------------------------------------------------------------------" ; broadcast
 	fi
 
