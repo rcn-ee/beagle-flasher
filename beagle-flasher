@@ -88,6 +88,12 @@ check_running_system () {
 		message="INFO: [destination=${destination}] is a valid block device"                                 ; broadcast
 	fi
 
+	if [ -f /sbin/sfdisk ] ; then
+		message="INFO: [/sbin/sfdisk --version]"                                                             ; broadcast
+		message="`/sbin/sfdisk --version || true`"                                                           ; broadcast
+		message="------------------------------------------------------------------------------------------" ; broadcast
+	fi
+
 	if [ ! -f /boot/config-$(uname -r) ] ; then
 		zcat /proc/config.gz > /boot/config-$(uname -r) || true
 		message="INFO: Creating: [/boot/config-$(uname -r)]"                                                 ; broadcast
@@ -130,16 +136,16 @@ partition_drive () {
 			sfdisk_fstype="L"
 		fi
 
-		sfdisk_options="--force --Linux --in-order --unit M"
+		sfdisk_options="--force"
 		sfdisk_boot_startmb="${rfs_rootfs_startmb}M"
 
 		message="INFO: Formatting: ${destination}"                                                           ; broadcast
-		message="INFO: sfdisk: [$(LC_ALL=C sfdisk --version)]"                                               ; broadcast
-		message="INFO: sfdisk: [sfdisk ${sfdisk_options} ${destination}]"                                    ; broadcast
-		message="INFO: sfdisk: [${sfdisk_boot_startmb},,${sfdisk_fstype},*]"                                 ; broadcast
+		message="INFO: /sbin/sfdisk: [$(LC_ALL=C /sbin/sfdisk --version)]"                                   ; broadcast
+		message="INFO: /sbin/sfdisk: [/sbin/sfdisk ${sfdisk_options} ${destination}]"                        ; broadcast
+		message="INFO: /sbin/sfdisk: [${sfdisk_boot_startmb},,${sfdisk_fstype},*]"                           ; broadcast
 		message="------------------------------------------------------------------------------------------" ; broadcast
 
-		LC_ALL=C sfdisk ${sfdisk_options} "${destination}" <<-__EOF__
+		LC_ALL=C /sbin/sfdisk ${sfdisk_options} "${destination}" <<-__EOF__
 			${sfdisk_boot_startmb},,${sfdisk_fstype},*
 		__EOF__
 
