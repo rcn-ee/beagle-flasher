@@ -19,9 +19,9 @@ mkfs_options=""
 flush_cache () {
 	sync
 	if [ "x${destination}" != "x" ] ; then
-		message="INFO: flush_cache: [blockdev --flushbufs ${destination}]"                                   ; broadcast
+		message="INFO: flush_cache: [blockdev --flushbufs ${destination}]"                         ; broadcast
 		blockdev --flushbufs ${destination} || true
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 	fi
 }
 
@@ -43,21 +43,21 @@ broadcast_over_display () {
 }
 
 example_failure () {
-	message="Example: /etc/default/beagle-flasher"                                                       ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
-	message="debug_over_display=tty0"                                                                    ; broadcast
-	message="source=/dev/mmcblk0"                                                                        ; broadcast
-	message="destination=/dev/mmcblk1"                                                                   ; broadcast
-	message="rfs_partition=single"                                                                       ; broadcast
-	message="rfs_rootfs_type=ext4"                                                                       ; broadcast
-	message="rfs_rootfs_startmb=4"                                                                       ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="Example: /etc/default/beagle-flasher"                                             ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
+	message="debug_over_display=tty0"                                                          ; broadcast
+	message="source=/dev/mmcblk0"                                                              ; broadcast
+	message="destination=/dev/mmcblk1"                                                         ; broadcast
+	message="rfs_partition=single"                                                             ; broadcast
+	message="rfs_rootfs_type=ext4"                                                             ; broadcast
+	message="rfs_rootfs_startmb=4"                                                             ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 	exit 2
 }
 
 write_failure () {
-	message="ERROR: writing to [destination=${destination}] failed..."                                   ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="ERROR: writing to [destination=${destination}] failed..."                         ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 	flush_cache
 	if [ "x${destination}" != "x" ] ; then
 		umount ${destination}p1 > /dev/null 2>&1 || true
@@ -67,119 +67,129 @@ write_failure () {
 
 check_running_system () {
 	if [ "x${source}" != "x" ] && [ "x${destination}" != "x" ] ; then
-		message="INFO: [lsblk -i]"                                                                           ; broadcast
-		message="`lsblk -i || true`"                                                                         ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
-		message="INFO: copying [${source}] -> [${destination}]"                                              ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="INFO: [lsblk -i]"                                                                 ; broadcast
+		message="`lsblk -i || true`"                                                               ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
+		message="INFO: copying [${source}] -> [${destination}]"                                    ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 	else
-		message="INFO: [lsblk -i]"                                                                           ; broadcast
-		message="`lsblk -i || true`"                                                                         ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
-		message="ERROR: Setup: [source] and [destination] in /etc/default/beagle-flasher"                    ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="INFO: [lsblk -i]"                                                                 ; broadcast
+		message="`lsblk -i || true`"                                                               ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
+		message="ERROR: Setup: [source] and [destination] in /etc/default/beagle-flasher"          ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 		example_failure
 	fi
 
 	if [ ! -b "${source}" ] ; then
-		message="ERROR: [source=${source}] does not exist"                                                   ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="ERROR: [source=${source}] does not exist"                                         ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 		example_failure
 	else
-		message="INFO: [source=${source}] is a valid block device"                                           ; broadcast
+		message="INFO: [source=${source}] is a valid block device"                                 ; broadcast
 	fi
 
 	if [ ! -b "${destination}" ] ; then
-		message="ERROR: [destination=${destination}] does not exist"                                         ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="ERROR: [destination=${destination}] does not exist"                               ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 		example_failure
 	else
-		message="INFO: [destination=${destination}] is a valid block device"                                 ; broadcast
+		message="INFO: [destination=${destination}] is a valid block device"                       ; broadcast
 	fi
 
 	if [ ! -f /sbin/sfdisk ] ; then
-		message="ERROR: Missing [/sbin/sfdisk]"                                                              ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="ERROR: Missing [/sbin/sfdisk]"                                                    ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 		example_failure
 	fi
 
 	if [ ! -f /sbin/mkfs.ext4 ] ; then
-		message="ERROR: Missing [/sbin/mkfs.ext4]"                                                           ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="ERROR: Missing [/sbin/mkfs.ext4]"                                                 ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 		example_failure
 	fi
 
 	if [ ! -f /usr/bin/rsync ] ; then
-		message="ERROR: Missing [/usr/bin/rsync]"                                                            ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="ERROR: Missing [/usr/bin/rsync]"                                                  ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 		example_failure
 	fi
 
 	if [ ! -f /boot/config-$(uname -r) ] ; then
 		zcat /proc/config.gz > /boot/config-$(uname -r) || true
-		message="INFO: Creating: [/boot/config-$(uname -r)]"                                                 ; broadcast
+		message="INFO: Creating: [/boot/config-$(uname -r)]"                                       ; broadcast
 	else
-		message="INFO: [/boot/config-$(uname -r)]"                                                           ; broadcast
+		message="INFO: [/boot/config-$(uname -r)]"                                                 ; broadcast
 	fi
 
-	message="INFO: Generating: [/boot/initrd.img-$(uname -r)]"                                          ; broadcast
-	message="update-initramfs: Generating /boot/initrd.img-$(uname -r)"                                 ; broadcast_over_display
+	message="INFO: Generating: [/boot/initrd.img-$(uname -r)]"                                         ; broadcast
+	message="update-initramfs: Generating /boot/initrd.img-$(uname -r)"                                ; broadcast_over_display
 	if [ -f /boot/initrd.img-$(uname -r) ] ; then
 		update-initramfs -u -k $(uname -r) || true
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 	else
 		update-initramfs -c -k $(uname -r) || true
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 	fi
 	flush_cache
 }
 
 format_single_root () {
-	message="/sbin/mkfs.ext4 ${mkfs_options} ${destination}p1 -L ${single_root_label}"                   ; broadcast
+	message="/sbin/mkfs.ext4 ${mkfs_options} ${destination}p1 -L ${single_root_label}"         ; broadcast
 	LC_ALL=C /sbin/mkfs.ext4 ${mkfs_options} ${destination}p1 -L ${single_root_label}
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 	flush_cache
 }
 
 copy_rootfs () {
-	message="INFO: Copying: ${source}p${media_rootfs} -> ${destination}p${media_rootfs}"                 ; broadcast
+	message="INFO: Copying: ${source}p${media_rootfs} -> ${destination}p${media_rootfs}"       ; broadcast
 	mkdir -p /tmp/rootfs/ || true
 
-	message="INFO: [mount ${destination}p${media_rootfs} /tmp/rootfs/ -o async,noatime]"                 ; broadcast
+	message="INFO: [mount ${destination}p${media_rootfs} /tmp/rootfs/ -o async,noatime]"       ; broadcast
 	mount ${destination}p${media_rootfs} /tmp/rootfs/ -o async,noatime
 
-	message="INFO: /usr/bin/rsync: [/ -> /tmp/rootfs/]"                                                  ; broadcast
+	message="INFO: /usr/bin/rsync: [/ -> /tmp/rootfs/]"                                        ; broadcast
 	/usr/bin/rsync -aAx /* /tmp/rootfs/ --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found,/lib/modules/*,/uEnv.txt} || write_failure
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 	flush_cache
 
 	mkdir -p /tmp/rootfs/lib/modules/$(uname -r)/ || true
 
-	message="Copying: Kernel modules"                                                                    ; broadcast
-	message="INFO: /usr/bin/rsync: /lib/modules/$(uname -r)/ -> /tmp/rootfs/lib/modules/$(uname -r)/"    ; broadcast
+	message="INFO: Copying: Kernel modules"                                                    ; broadcast
+	message="INFO: /usr/bin/rsync: /lib/modules/$(uname -r)/ -> /tmp/rootfs/lib/modules/$(uname -r)/" ; broadcast
 	/usr/bin/rsync -aAx /lib/modules/$(uname -r)/* /tmp/rootfs/lib/modules/$(uname -r)/ || write_failure
+	message="--------------------------------------------------------------------------------" ; broadcast
 	flush_cache
 
-	message="Copying: ${source}p${media_rootfs} -> ${destination}p${media_rootfs} complete"              ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="INFO: Generating: /etc/fstab"                                                           ;  broadcast
+	echo "# /etc/fstab: static file system information." > /tmp/rootfs/etc/fstab
+	echo "#" >> /tmp/rootfs/etc/fstab
+	echo "${destination}p1  /  ext4  noatime,errors=remount-ro  0  1" >> /tmp/rootfs/etc/fstab
+	echo "debugfs  /sys/kernel/debug  debugfs  mode=755,uid=root,gid=gpio,defaults  0  0" >> /tmp/rootfs/etc/fstab
+	message="INFO: [cat /tmp/rootfs/etc/fstab]"                                                ; broadcast
+	message="`cat /tmp/rootfs/etc/fstab`"                                                      ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
+
+	message="Copying: ${source}p${media_rootfs} -> ${destination}p${media_rootfs} complete"    ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 
 	message="Final System Tweaks:" ; broadcast
 }
 
 partition_drive () {
-	message="INFO: Erasing: [${destination}]"                                                            ; broadcast
+	message="INFO: Erasing: [${destination}]"                                                  ; broadcast
 	flush_cache
-	message="INFO: [dd if=/dev/zero of=${destination} bs=1M count=108 status=progress]"                  ; broadcast
+	message="INFO: [dd if=/dev/zero of=${destination} bs=1M count=108 status=progress]"        ; broadcast
 	dd if=/dev/zero of=${destination} bs=1M count=108 status=progress
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 	sync
-	message="INFO: [dd if=${destination} of=/dev/null bs=1M count=108 status=progress]"                  ; broadcast
+	message="INFO: [dd if=${destination} of=/dev/null bs=1M count=108 status=progress]"        ; broadcast
 	dd if=${destination} of=/dev/null bs=1M count=108 status=progress
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 	sync
 	flush_cache
-	message="INFO: Erasing: [${destination}] complete"                                                   ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="INFO: Erasing: [${destination}] complete"                                         ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 
 	if [ "x${rfs_partition}" = "xsingle" ] ; then
 		rfs_rootfs_startmb=${rfs_rootfs_startmb:-"4"}
@@ -192,21 +202,21 @@ partition_drive () {
 		sfdisk_options="--force"
 		sfdisk_boot_startmb="${rfs_rootfs_startmb}M"
 
-		message="INFO: Partitioning: ${destination}"                                                         ; broadcast
-		message="INFO: /sbin/sfdisk: [$(LC_ALL=C /sbin/sfdisk --version)]"                                   ; broadcast
-		message="INFO: /sbin/sfdisk: [/sbin/sfdisk ${sfdisk_options} ${destination}]"                        ; broadcast
-		message="INFO: /sbin/sfdisk: [${sfdisk_boot_startmb},,${sfdisk_fstype},*]"                           ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="INFO: Partitioning: ${destination}"                                               ; broadcast
+		message="INFO: /sbin/sfdisk: [$(LC_ALL=C /sbin/sfdisk --version)]"                         ; broadcast
+		message="INFO: /sbin/sfdisk: [/sbin/sfdisk ${sfdisk_options} ${destination}]"              ; broadcast
+		message="INFO: /sbin/sfdisk: [${sfdisk_boot_startmb},,${sfdisk_fstype},*]"                 ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 
 		LC_ALL=C /sbin/sfdisk ${sfdisk_options} "${destination}" <<-__EOF__
 			${sfdisk_boot_startmb},,${sfdisk_fstype},*
 		__EOF__
 
 		flush_cache
-		message="INFO: Formatting: ${destination}"                                                           ; broadcast
+		message="INFO: Formatting: ${destination}"                                                 ; broadcast
 		format_single_root
-		message="INFO: Formatting: ${destination} complete"                                                  ; broadcast
-		message="------------------------------------------------------------------------------------------" ; broadcast
+		message="INFO: Formatting: ${destination} complete"                                        ; broadcast
+		message="--------------------------------------------------------------------------------" ; broadcast
 
 		media_rootfs="1"
 		copy_rootfs
@@ -219,17 +229,17 @@ partition_drive () {
 if [ -f /etc/default/beagle-flasher ] ; then
 	clear
 	. /etc/default/beagle-flasher
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 	message="Version: [${version_message}]" ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
-	message="cat /etc/default/beagle-flasher:"                                                           ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
-	message="`cat /etc/default/beagle-flasher`"                                                          ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
+	message="cat /etc/default/beagle-flasher:"                                                 ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
+	message="`cat /etc/default/beagle-flasher`"                                                ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 else
-	message="------------------------------------------------------------------------------------------" ; broadcast
-	message="Version: [${version_message}]"                                                              ; broadcast
-	message="------------------------------------------------------------------------------------------" ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
+	message="Version: [${version_message}]"                                                    ; broadcast
+	message="--------------------------------------------------------------------------------" ; broadcast
 	example_failure
 fi
 
