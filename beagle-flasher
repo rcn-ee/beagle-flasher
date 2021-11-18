@@ -191,7 +191,7 @@ partition_drive () {
 	message="INFO: Erasing: [${destination}] complete"                                         ; broadcast
 	message="--------------------------------------------------------------------------------" ; broadcast
 
-	if [ "x${bootloader}" != "x" ]
+	if [ "x${bootloader}" != "x" ] ; then
 		if [ -f ${bootloader} ] ; then
 			message="INFO: [/bin/bash ${bootloader}]"                                                  ; broadcast
 			/bin/bash ${bootloader}
