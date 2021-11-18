@@ -10,10 +10,10 @@ version_message="20211118.0: ReWrite from Scratch..."
 flush_cache () {
 	sync
 	if [ "x${destination}" != "x" ] ; then
-		message="INFO: [blockdev --flushbufs ${destination}]"                    ; broadcast
+		message="INFO: [blockdev --flushbufs ${destination}]"                            ; broadcast
 		blockdev --flushbufs ${destination} || true
+		message="----------------------------------------------------------------------" ; broadcast
 	fi
-	message="----------------------------------------------------------------------" ; broadcast
 }
 
 broadcast () {
@@ -42,6 +42,7 @@ write_failure () {
 		umount ${destination}p1 > /dev/null 2>&1 || true
 		umount ${destination}p2 > /dev/null 2>&1 || true
 	fi
+	exit 2
 }
 
 check_running_system () {
