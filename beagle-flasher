@@ -61,12 +61,21 @@ check_running_system () {
 		example_failure
 	fi
 
+	if [ ! -b "${source}" ] ; then
+		message="ERROR: [source=${source}] does not exist"                               ; broadcast
+		message="----------------------------------------------------------------------" ; broadcast
+		example_failure
+	else
+		message="INFO: [source=${source}] is a valid block device"                       ; broadcast
+		message="----------------------------------------------------------------------" ; broadcast
+	fi
+
 	if [ ! -b "${destination}" ] ; then
 		message="ERROR: [destination=${destination}] does not exist"                     ; broadcast
 		message="----------------------------------------------------------------------" ; broadcast
 		example_failure
 	else
-		message="INFO: [destination${destination}] is a valid block device"              ; broadcast
+		message="INFO: [destination=${destination}] is a valid block device"             ; broadcast
 		message="----------------------------------------------------------------------" ; broadcast
 	fi
 
