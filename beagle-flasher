@@ -8,8 +8,12 @@ fi
 version_message="20211118.0: ReWrite from Scratch..."
 
 flush_cache () {
+	message="----------------------------------------------------------------------" ; broadcast
 	sync
-	blockdev --flushbufs ${destination} || true
+	if [ "x${destination}" != "x" ] ; then
+		blockdev --flushbufs ${destination} || true
+	fi
+	message="----------------------------------------------------------------------" ; broadcast
 }
 
 broadcast () {
@@ -35,8 +39,10 @@ write_failure () {
 
 	message="----------------------------------------------------------------------" ; broadcast
 	flush_cache
-	umount ${destination}p1 > /dev/null 2>&1 || true
-	umount ${destination}p2 > /dev/null 2>&1 || true
+	if [ "x${destination}" != "x" ] ; then
+		umount ${destination}p1 > /dev/null 2>&1 || true
+		umount ${destination}p2 > /dev/null 2>&1 || true
+	fi
 }
 
 check_running_system () {
@@ -55,24 +61,30 @@ check_running_system () {
 
 	if [ ! -b "${destination}" ] ; then
 		message="Error: [${destination}] does not exist"                                 ; broadcast
+		message="----------------------------------------------------------------------" ; broadcast
 		write_failure
 	else
 		message="INFO: [${destination}] is a valid block device"                         ; broadcast
+		message="----------------------------------------------------------------------" ; broadcast
 	fi
 
 	if [ ! -f /boot/config-$(uname -r) ] ; then
-		message="INFO: Creating: [/boot/config-$(uname -r)]"                             ; broadcast
 		zcat /proc/config.gz > /boot/config-$(uname -r) || true
+		message="INFO: Creating: [/boot/config-$(uname -r)]"                             ; broadcast
+		message="----------------------------------------------------------------------" ; broadcast
 	else
 		message="INFO: [/boot/config-$(uname -r)]"                                       ; broadcast
+		message="----------------------------------------------------------------------" ; broadcast
 	fi
 
 	if [ -f /boot/initrd.img-$(uname -r) ] ; then
 		update-initramfs -u -k $(uname -r) || true
 		message="INFO: Updating: [/boot/initrd.img-$(uname -r)]"                         ; broadcast
+		message="----------------------------------------------------------------------" ; broadcast
 	else
 		update-initramfs -c -k $(uname -r) || true
 		message="INFO: Creating: [/boot/initrd.img-$(uname -r)]"                         ; broadcast
+		message="----------------------------------------------------------------------" ; broadcast
 	fi
 	flush_cache
 }
