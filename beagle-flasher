@@ -10,7 +10,9 @@ version_message="20211118.0: ReWrite from Scratch..."
 broadcast () {
 	if [ "x${message}" != "x" ] ; then
 		echo "${message}"
-		echo "${message}" > /dev/tty0 || true
+		if [ "x${debug_video}" != "x" ] ; then
+			echo "${message}" > /dev/${debug_video} || true
+		fi
 	fi
 }
 
@@ -19,7 +21,9 @@ broadcast_file () {
 		message="cat ${bfile}" ; broadcast
 		message="-----------------------------" ; broadcast
 		cat ${bfile}
-		cat ${bfile} > /dev/tty0 || true
+		if [ "x${debug_video}" != "x" ] ; then
+			cat ${bfile} > /dev/${debug_video} || true
+		fi
 		message="-----------------------------" ; broadcast
 	fi
 }
@@ -28,18 +32,20 @@ failure () {
 	message="-----------------------------" ; broadcast
 }
 
-clear
-message="-----------------------------" ; broadcast
-message="Version: [${version_message}]" ; broadcast
-message="-----------------------------" ; broadcast
-
 ###FIXME
 if [ -f /etc/default/beagle-flasher ] ; then
+	clear
+	. /etc/default/beagle-flasher
+	message="-----------------------------" ; broadcast
+	message="Version: [${version_message}]" ; broadcast
 	message="-----------------------------" ; broadcast
 	bfile="/etc/default/beagle-flasher"     ; broadcast_file
 	message="-----------------------------" ; broadcast
-	. /etc/default/beagle-flasher
 else
+	message="-----------------------------" ; broadcast
+	message="Version: [${version_message}]" ; broadcast
+	message="-----------------------------" ; broadcast
 	message="ERROR: Please setup: /etc/default/beagle-flasher" ; broadcast
+	message="-----------------------------" ; broadcast
 	failure
 fi
