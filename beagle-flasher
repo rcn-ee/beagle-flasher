@@ -5,8 +5,16 @@ if ! id | grep -q root; then
 	exit
 fi
 
-
 version_message="20211118.0: ReWrite from Scratch..."
+
+#mke2fs -c
+#Check the device for bad blocks before creating the file system.
+#If this option is specified twice, then a slower read-write test is
+#used instead of a fast read-only test.
+
+mkfs_options=""
+#mkfs_options="-c"
+#mkfs_options="-cc"
 
 flush_cache () {
 	sync
@@ -88,10 +96,16 @@ check_running_system () {
 		message="INFO: [destination=${destination}] is a valid block device"                                 ; broadcast
 	fi
 
-	if [ -f /sbin/sfdisk ] ; then
-		message="INFO: [/sbin/sfdisk --version]"                                                             ; broadcast
-		message="`/sbin/sfdisk --version || true`"                                                           ; broadcast
+	if [ ! -f /sbin/sfdisk ] ; then
+		message="ERROR: Missing [/sbin/sfdisk]"                                                              ; broadcast
 		message="------------------------------------------------------------------------------------------" ; broadcast
+		example_failure
+	fi
+
+	if [ ! -f /sbin/mkfs.ext4 ] ; then
+		message="ERROR: Missing [/sbin/mkfs.ext4]"                                                           ; broadcast
+		message="------------------------------------------------------------------------------------------" ; broadcast
+		example_failure
 	fi
 
 	if [ ! -f /boot/config-$(uname -r) ] ; then
@@ -113,6 +127,14 @@ check_running_system () {
 	flush_cache
 }
 
+format_single_root () {
+	message="/sbin/mkfs.ext4 ${mkfs_options} ${destination}p1 -L ${single_root_label}"                   ; broadcast
+	message="------------------------------------------------------------------------------------------" ; broadcast
+	LC_ALL=C /sbin/mkfs.ext4 ${mkfs_options} ${destination}p1 -L ${single_root_label}
+	message="------------------------------------------------------------------------------------------" ; broadcast
+	flush_cache
+}
+
 partition_drive () {
 	message="INFO: Erasing: [${destination}]"                                                            ; broadcast
 	flush_cache
@@ -128,13 +150,13 @@ partition_drive () {
 	message="INFO: Erasing: [${destination}] complete"                                                   ; broadcast
 	message="------------------------------------------------------------------------------------------" ; broadcast
 
-
 	if [ "x${rfs_partition}" = "xsingle" ] ; then
 		rfs_rootfs_startmb=${rfs_rootfs_startmb:-"4"}
 
 		if [ "x${rfs_rootfs_type}" = "xext4" ] ; then
 			sfdisk_fstype="L"
 		fi
+		single_root_label=${single_root_label:-"rootfs"}
 
 		sfdisk_options="--force"
 		sfdisk_boot_startmb="${rfs_rootfs_startmb}M"
@@ -150,7 +172,7 @@ partition_drive () {
 		__EOF__
 
 		flush_cache
-		#format_single_root
+		format_single_root
 		message="INFO: Formatting: ${destination} complete"                                                  ; broadcast
 		message="------------------------------------------------------------------------------------------" ; broadcast
 
