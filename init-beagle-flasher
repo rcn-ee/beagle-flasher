@@ -146,15 +146,14 @@ copy_rootfs () {
 	message="--------------------------------------------------------------------------------" ; broadcast
 	flush_cache
 
-	mkdir -p /tmp/rootfs/lib/modules/$(uname -r)/ || true
-
 	message="INFO: Copying: Kernel modules"                                                    ; broadcast
+	mkdir -p /tmp/rootfs/lib/modules/$(uname -r)/ || true
 	message="INFO: /usr/bin/rsync: /lib/modules/$(uname -r)/ -> /tmp/rootfs/lib/modules/$(uname -r)/" ; broadcast
 	/usr/bin/rsync -aAx /lib/modules/$(uname -r)/* /tmp/rootfs/lib/modules/$(uname -r)/ || write_failure
 	message="--------------------------------------------------------------------------------" ; broadcast
 	flush_cache
 
-	message="INFO: Generating: /etc/fstab"                                                           ;  broadcast
+	message="INFO: Generating: /etc/fstab"                                                     ;  broadcast
 	echo "# /etc/fstab: static file system information." > /tmp/rootfs/etc/fstab
 	echo "#" >> /tmp/rootfs/etc/fstab
 	echo "${destination}p1  /  ext4  noatime,errors=remount-ro  0  1" >> /tmp/rootfs/etc/fstab
@@ -163,6 +162,7 @@ copy_rootfs () {
 	message="`cat /tmp/rootfs/etc/fstab`"                                                      ; broadcast
 	message="--------------------------------------------------------------------------------" ; broadcast
 
+	sed -i -e 's:cmdline=init:#cmdline=init:g' /tmp/rootfs/boot/uEnv.txt
 	message="INFO: [cat /tmp/rootfs/boot/uEnv.txt]"                                            ; broadcast
 	message="`cat /tmp/rootfs/boot/uEnv.txt`"                                                  ; broadcast
 	message="--------------------------------------------------------------------------------" ; broadcast
@@ -183,6 +183,10 @@ copy_rootfs () {
 	umount /tmp || true
 	message="--------------------------------------------------------------------------------" ; broadcast
 	flush_cache
+
+	message="INFO: [umount /tmp/rootfs/ || umount -l /tmp/rootfs/ || write_failure]"           ; broadcast
+	umount /tmp/rootfs/ || umount -l /tmp/rootfs/ || write_failure
+	message="--------------------------------------------------------------------------------" ; broadcast
 
 	message="INFO: Force writeback of eMMC buffers by Syncing: ${destination}"                 ; broadcast
 	message="INFO: [dd if=${destination} of=/dev/null count=100000 status=progress]"           ; broadcast
