@@ -9,7 +9,7 @@ cp -v ./beagle-flasher /usr/sbin/
 cp -v ./init-beagle-flasher /usr/sbin/
 cp -v ./init-beagle-flasher-test /usr/sbin/
 cp -v ./init-shutdown-beagle-flasher /usr/sbin/
-cp -v ./beagle-flasher-init-shutdown.service /lib/systemd/system/
+cp -v ./bb-beagle-flasher.beagle-flasher-init-shutdown.service /lib/systemd/system/beagle-flasher-init-shutdown.service
 
 ###FIXME: only for testing...
 if [ ! -f /etc/default/beagle-flasher ] ; then
